@@ -7,8 +7,8 @@ def analyze_sentiment(text):
     return analysis.sentiment.polarity, analysis.sentiment.subjectivity
 
 # Streamlit app layout
-st.title("Sentiment Analysis App")
-st.write("Enter text to analyze its sentiment:")
+st.title("Sentiment Analysis App🙊")
+st.write("Enter text to analyze its sentiment📃:")
 
 # Create a session state variable to track typing
 if 'is_typing' not in st.session_state:
@@ -25,7 +25,7 @@ if st.session_state.is_typing:
 if st.button("Analyze"):
     if raw_text:
         sentiment_score, subjectivity_score = analyze_sentiment(raw_text)
-        sentiment = "Positive😊😊" if sentiment_score > 0 else "Negative💀💀" if sentiment_score < 0 else "Neutral😶😶"
+        sentiment = "Positive😊" if sentiment_score > 0 else "Negative💀" if sentiment_score < 0 else "Neutral😶"
         
         # Create a detailed output
         output = f"""
@@ -36,9 +36,9 @@ if st.button("Analyze"):
         
         ### Explanation:
         - **Sentiment Score:** The sentiment score ranges from -1 to 1.
-            - A score closer to **1** indicates a **positive sentiment** (e.g., "I love this product!").
-            - A score closer to **-1** indicates a **negative sentiment** (e.g., "I hate this service!").
-            - A score around **0** indicates a **neutral sentiment** (e.g., "The product is okay.").
+            - A score closer to **1** indicates a **positive sentiment** (e.g., "Ashutosh is Legit!").
+            - A score closer to **-1** indicates a **negative sentiment** (e.g., "I hate this world!").
+            - A score around **0** indicates a **neutral sentiment** (e.g., "This College is okay.").
         
         - **Subjectivity Score:** The subjectivity score ranges from 0 to 1.
             - A score closer to **1** indicates that the text is **more subjective** (e.g., "I think this is the best movie ever!").
