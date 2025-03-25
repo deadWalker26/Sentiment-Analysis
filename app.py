@@ -19,7 +19,7 @@ raw_text = st.text_area("Input text here", on_change=lambda: setattr(st.session_
 
 # Show typing indicator
 if st.session_state.is_typing:
-    st.markdown("typing...")
+    st.markdown("Loading...")
 
 # Analyze button
 if st.button("Analyze"):
