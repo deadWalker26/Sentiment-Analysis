@@ -1,0 +1,39 @@
+import streamlit as st
+from textblob import TextBlob
+
+# Function to analyze sentiment
+def analyze_sentiment(text):
+    analysis = TextBlob(text)
+    return analysis.sentiment.polarity, analysis.sentiment.subjectivity
+
+# Streamlit app layout
+st.title("Sentiment Analysis App")
+st.write("Enter text to analyze its sentiment:")
+
+# Text input
+user_input = st.text_area("Input text here")
+
+# Analyze button
+if st.button("Analyze"):
+    if user_input:
+        sentiment_score, subjectivity_score = analyze_sentiment(user_input)
+        sentiment = "Positive😊" if sentiment_score > 0 else "Negative💀" if sentiment_score < 0 else "Neutral🤐"
+        
+        # Create a detailed output
+        output = f"""
+        **Sentiment Analysis Result:**
+        - **Sentiment:** {sentiment}
+        - **Sentiment Score:** {sentiment_score:.2f}
+        - **Subjectivity Score:** {subjectivity_score:.2f}
+        
+        Based on the analysis of the text you provided, the sentiment is classified as **{sentiment}**. 
+        The sentiment score of **{sentiment_score:.2f}** indicates that the text leans towards being **{sentiment.lower()}**. 
+        This suggests that the emotions conveyed in the text are predominantly **{sentiment.lower()}** in nature. 
+        The subjectivity score of **{subjectivity_score:.2f}** indicates that the text is **{"more subjective" if subjectivity_score > 0.5 else "more objective"}**. 
+        This means that the text contains personal opinions or feelings rather than just factual information based on above paragraph. 😜😜
+        """
+        
+        st.markdown(output)
+    else:
+        st.warning("Please enter some text for analysis.")
+    00
