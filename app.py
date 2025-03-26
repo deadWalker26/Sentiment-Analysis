@@ -12,7 +12,7 @@ sia = SentimentIntensityAnalyzer()
 # Function to analyze sentiment
 def analyze_sentiment(text):
     analysis = sia.polarity_scores(text)
-    return analysis.sentiment.polarity, analysis.sentiment.subjectivity
+    return  analysis.sentiment.subjectvity
 
 # Streamlit app layout
 st.title("Sentiment Analysis App🙊")
