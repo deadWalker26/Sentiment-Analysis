@@ -1,71 +1,75 @@
 import streamlit as st
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
-from textblob import TextBlob
+import joblib
+import pandas as pd
+import language_tool_python
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import make_pipeline
+from sklearn.metrics import accuracy_score
 
-# Download VADER lexicon
-nltk.download('vader_lexicon')
+# Load LanguageTool for grammar checking
+import language_tool_python
 
-# Initialize VADER
-sia = SentimentIntensityAnalyzer()
+tool = language_tool_python.LanguageTool('en-US')
 
-# Function to analyze sentiment
-def analyze_sentiment(text):
-    sentiment_scores = sia.polarity_scores(text)
-    compound_score = sentiment_scores['compound']
+# Load or Train Sentiment Analysis Model
+@st.cache_resource
+def train_model():
+    # Load dataset (replace with your custom dataset)
+    df = pd.read_csv("sentiment_data.csv")  # Ensure you have a dataset file
 
-    sentiment = (
-        "Positive 😊" if compound_score > 0.05 
-        else "Negative 💀" if compound_score < -0.05 
-        else "Neutral 😶"
-    )
+    X, y = df['text'], df['label']
 
-    subjectivity_score = TextBlob(text).sentiment.subjectivity
-    return compound_score, sentiment, subjectivity_score
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Streamlit app layout
-st.title("📃 Sentiment Analysis App")
-st.write("🔍 Enter text below and analyze its sentiment:")
+    # Create model pipeline
+    model = make_pipeline(CountVectorizer(), MultinomialNB())
 
-# Text input
-raw_text = st.text_area("Input text here")
+    # Train model
+    model.fit(X_train, y_train)
 
-# Analyze button
-if st.button("Analyze"):
-    if raw_text:
-        sentiment_score, sentiment, subjectivity_score = analyze_sentiment(raw_text)
+    # Save model
+    joblib.dump(model, 'sentiment_model.pkl')
 
-        # Create a detailed output
-        output = f"""
-        ## **📊 Sentiment Analysis Result**
-        - **Sentiment:** {sentiment}
-        - **Sentiment Score (VADER):** {sentiment_score:.2f}
-        - **Subjectivity Score (TextBlob):** {subjectivity_score:.2f}
-        
-        ### **Explanation:**
-        - **Sentiment Score:** The score ranges from **-1 to 1**:
-            - **1** = Strong **positive** sentiment.
-            - **-1** = Strong **negative** sentiment.
-            - **0** = **Neutral** sentiment.
-        
-        - **Subjectivity Score:** 
-            - Closer to **1** = More **subjective** (personal opinions, feelings).
-            - Closer to **0** = More **objective** (factual statements).
+    # Evaluate accuracy
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
 
-        ### **Summary:**
-        The analyzed text has a **{sentiment.lower()}** sentiment with a score of **{sentiment_score:.2f}**.
-        It is classified as **{"more subjective" if subjectivity_score > 0.5 else "more objective"}**.
-        """
-        
-        st.markdown(output)
+    return model, accuracy
 
-        # Show sentiment image based on sentiment_score
-        if sentiment_score > 0:
-            st.image("Positive_sentiment.jpg")
-        elif sentiment_score == 0:
-            st.image("Neutral_sentiment.jpg")
+# Load trained model
+try:
+    model = joblib.load('sentiment_model.pkl')
+except:
+    model, accuracy = train_model()
+    st.write(f"Model Trained with Accuracy: {accuracy:.2f}")
+
+# Streamlit UI
+st.title(" Sentiment Analysis App 🔍 ")
+
+st.subheader("📌 Enter a sentence for sentiment analysis")
+
+# User Input
+user_text = st.text_area("Enter Text Here:")
+
+if st.button("Analyze Sentiment"):
+    if user_text:
+        # Correct grammar
+        corrected_text = tool.correct(user_text)
+        st.write("✅ **Grammar Corrected Text:**", corrected_text)
+
+        # Predict sentiment
+        sentiment = model.predict([corrected_text])[0]
+
+        # Display sentiment result
+        if sentiment == "positive":
+            st.success("😊 Positive Sentiment")
+        elif sentiment == "negative":
+            st.error("☹️ Negative Sentiment")
         else:
-            st.image("Negative_sentiment.jpg")
-
+            st.warning("😐 Neutral Sentiment")
     else:
-        st.warning("⚠️ Please enter some text for analysis.")
+        st.warning("⚠️ Please enter some text!")
+
