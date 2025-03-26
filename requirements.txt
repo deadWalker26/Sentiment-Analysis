@@ -38,6 +38,7 @@ safetensors==0.5.3
 setuptools==76.0.0
 six==1.17.0
 smmap==5.0.2
+scikit-learn
 streamlit==1.43.1
 sympy==1.13.1
 tenacity==9.0.0
