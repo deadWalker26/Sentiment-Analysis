@@ -1,9 +1,17 @@
 import streamlit as st
-from textblob import TextBlob
+from nltk.sentiment import SentimentIntensityAnalyzer
+import nltk
+
+# Download VADER lexicon
+nltk.download('vader_lexicon')
+
+# Initialize VADER
+sia = SentimentIntensityAnalyzer()
+
 
 # Function to analyze sentiment
 def analyze_sentiment(text):
-    analysis = TextBlob(text)
+    analysis = sia.polarity_scores(text)
     return analysis.sentiment.polarity, analysis.sentiment.subjectivity
 
 # Streamlit app layout
