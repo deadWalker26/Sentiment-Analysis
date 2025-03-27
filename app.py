@@ -59,7 +59,7 @@ if st.button('Analyze'):
             if grammar_issues:
                 st.warning("Grammar issues detected:")
                 for issue in grammar_issues:
-                    st.write(f"- {issue.message} (Suggestion: {issue.replacements})")
+                    st.markdown(f"- {issue.message} (Suggestion: {issue.replacements})")
             
             # Analyze sentiment
             sentiment_scores = analyze_sentiment(user_input)
