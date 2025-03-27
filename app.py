@@ -1,84 +1,63 @@
 import streamlit as st
-import joblib
 import pandas as pd
-import language_tool_python
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.pipeline import make_pipeline
-from sklearn.metrics import accuracy_score
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import language_tool_python  # For grammar checking
+import re  # For regular expressions
 
-# Load LanguageTool for grammar checking
-import language_tool_python
+# Initialize VADER sentiment analyzer
+analyzer = SentimentIntensityAnalyzer()
+# Initialize LanguageTool for grammar checking
+grammar_tool = language_tool_python.LanguageTool('en-US')
 
-import language_tool_python
+# Function to analyze sentiment using VADER
+def analyze_sentiment(text):
+    if not text or not isinstance(text, str):
+        return None
+    scores = analyzer.polarity_scores(text)
+    return scores
 
-# Use the public API instead of a local server
-tool = language_tool_python.LanguageToolPublicAPI('en-US')
+# Function to check grammar
+def check_grammar(text):
+    matches = grammar_tool.check(text)
+    return matches
 
-text = "This is a example sentence with error."
-matches = tool.check(text)
-
-for match in matches:
-    print(match.ruleId, match.replacements)
-
-# Load or Train Sentiment Analysis Model
-@st.cache_resource
-def train_model():
-    # Load dataset (replace with your custom dataset)
-    df = pd.read_csv("sentiment_data.csv")  # Ensure you have a dataset file
-
-    X, y = df['text'], df['label']
-
-    # Split data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Create model pipeline
-    model = make_pipeline(CountVectorizer(), MultinomialNB())
-
-    # Train model
-    model.fit(X_train, y_train)
-
-    # Save model
-    joblib.dump(model, 'sentiment_model.pkl')
-
-    # Evaluate accuracy
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-
-    return model, accuracy
-
-# Load trained model
-try:
-    model = joblib.load('sentiment_model.pkl')
-except:
-    model, accuracy = train_model()
-    st.write(f"Model Trained with Accuracy: {accuracy:.2f}")
+# Function to check if the text is nonsensical
+def is_nonsensical(text):
+    # Check if the text contains only random characters or is too short
+    if len(text) < 5 or not re.search(r'[a-zA-Z]', text):
+        return True
+    return False
 
 # Streamlit UI
-st.title(" Sentiment Analysis App 🔍 ")
+st.title('Sentiment Analysis App')
+st.write('Enter a paragraph of text to analyze its sentiment.')
 
-st.subheader("📌 Enter a sentence for sentiment analysis")
+# Text input from user
+user_input = st.text_area("Input Text", height=200)
 
-# User Input
-user_text = st.text_area("Enter Text Here:")
-
-if st.button("Analyze Sentiment"):
-    if user_text:
-        # Correct grammar
-        corrected_text = tool.correct(user_text)
-        st.write("✅ **Grammar Corrected Text:**", corrected_text)
-
-        # Predict sentiment
-        sentiment = model.predict([corrected_text])[0]
-
-        # Display sentiment result
-        if sentiment == "positive":
-            st.success("😊 Positive Sentiment")
-        elif sentiment == "negative":
-            st.error("☹️ Negative Sentiment")
+# Button to submit the input
+if st.button('Analyze'):
+    if user_input:
+        # Check if the input is nonsensical
+        if is_nonsensical(user_input):
+            st.error("Invalid input. Please enter a valid text.")
         else:
-            st.warning("😐 Neutral Sentiment")
+            # Check grammar
+            grammar_issues = check_grammar(user_input)
+            if grammar_issues:
+                st.warning("Grammar issues detected:")
+                for issue in grammar_issues:
+                    st.write(f"- {issue.message} (Suggestion: {issue.replacements})")
+            
+            # Analyze sentiment
+            sentiment_scores = analyze_sentiment(user_input)
+            if sentiment_scores is None:
+                st.error("Invalid input. Please enter a valid text.")
+            else:
+                st.success(f"Sentiment Analysis Results: {sentiment_scores}")
+                st.write(f"Positive: {sentiment_scores['pos']*100:.2f}%")
+                st.write(f"Negative: {sentiment_scores['neg']*100:.2f}%")
+                st.write(f"Neutral: {sentiment_scores['neu']*100:.2f}%")
+                st.write(f"Overall Sentiment Score: {sentiment_scores['compound']:.2f}")
     else:
-        st.warning("⚠️ Please enter some text!")
-
+        st.warning("Please enter some text to analyze.")
