@@ -1,7 +1,7 @@
 text,label,source,timestamp,user_id
-"I love this product!",positive,review,2025-03-01 12:34:56,ashutoash_26,Amazon.in
+"I love this product!",positive,review,2025-03-01 12:34:56,ashutoash_26
 "This is the worst service ever.",negative,review,2025-03-02 14:22:11,prakash_002
 "I am feeling okay today.",neutral,tweet,2025-03-03 09:15:30,ashutoshh_26
 "Absolutely fantastic experience!",positive,feedback,2025-03-04 10:45:00,user_004
 "I hate the way this works.",negative,review,2025-03-05 11:22:33,ashutoshh_26
-"The weather is nice today.",neutral,tweet,2025-03-06 08:00:45,adityaa.03, Twitter(X)
+"The weather is nice today.",neutral,tweet,2025-03-06 08:00:45,adityaa.03
