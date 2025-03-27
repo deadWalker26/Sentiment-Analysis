@@ -84,4 +84,4 @@ if st.button('Analyze'):
                 st.write(f"Neutral:🤐 {sentiment_scores['neu']*100:.2f}%")
                 st.write(f"Overall Sentiment Score: {sentiment_scores['compound']:.2f}")
     else:
-        st.warning("Please enter some text to analyze.")
+        st.warning("Why in a hurry please enter some text to analyze.")
