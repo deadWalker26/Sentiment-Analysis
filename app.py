@@ -11,7 +11,16 @@ from sklearn.metrics import accuracy_score
 # Load LanguageTool for grammar checking
 import language_tool_python
 
-tool = language_tool_python.LanguageTool('en-US')
+import language_tool_python
+
+# Use the public API instead of a local server
+tool = language_tool_python.LanguageToolPublicAPI('en-US')
+
+text = "This is a example sentence with error."
+matches = tool.check(text)
+
+for match in matches:
+    print(match.ruleId, match.replacements)
 
 # Load or Train Sentiment Analysis Model
 @st.cache_resource
