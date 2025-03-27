@@ -59,9 +59,11 @@ if st.button('Analyze'):
             if grammar_issues:
                 st.warning("Grammar issues detected:")
                 for issue in grammar_issues:
-                    st.markdown(f"- {issue.message} (Suggestion: {issue.replacements})")
-            
-            # Analyze sentiment
+                    corrected_text = grammar_tool.correct(user_input)
+                      st.write("### Grammar Suggestions:")
+                      st.write(corrected_text)
+                    
+           # Analyze sentiment
             sentiment_scores = analyze_sentiment(user_input)
             if sentiment_scores is None:
                 st.error("Invalid input. Please enter a valid text.")
