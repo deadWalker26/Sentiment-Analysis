@@ -2,7 +2,10 @@ import streamlit as st
 import pandas as pd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import language_tool_python  # For grammar checking
+from langdetect import detect, DetectorFactory
 import re  # For regular expressions
+
+DetectorFactory.seed = 0
 
 # Initialize VADER sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
@@ -54,6 +57,14 @@ if st.button('Analyze'):
         if is_nonsensical(user_input):
             st.error("Invalid input. Please enter a valid text.")
         else:
+            # Detect language
+            try:
+                language = detect(user_input)
+                st.write(f"Detected Language: {language}")
+            except Exception as e:
+                st.error("Error detecting language.")
+                language = None
+                
             # Check grammar
             grammar_issues = check_grammar(user_input)
             if grammar_issues:
