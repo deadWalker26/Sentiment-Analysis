@@ -72,11 +72,7 @@ if st.button('Analyze'):
                 for issue in grammar_issues:
                    st.write(f"- {issue.message} (Suggestion: {issue.replacements})")
 
-             if language == 'en':
-                sentiment_scores = analyze_sentiment(user_input)
-                if sentiment_scores is None:
-                    st.error("Invalid input. Please enter a valid text.")
-                    
+    
            # Analyze sentiment
             sentiment_scores = analyze_sentiment(user_input)
             if sentiment_scores is None:
