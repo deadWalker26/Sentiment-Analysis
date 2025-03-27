@@ -37,8 +37,8 @@ def is_nonsensical(text):
     return False
 
 # Streamlit UI
-st.title('Sentiment Analysis App')
-st.write('Enter a paragraph of text to analyze its sentiment.')
+st.title('🔍Sentiment Analysis App')
+st.write('Enter a paragraph of text to analyze its sentiment.📃')
 
 # Text input from user
 user_input = st.text_area("Input Text", height=200)
@@ -63,9 +63,9 @@ if st.button('Analyze'):
                 st.error("Invalid input. Please enter a valid text.")
             else:
                 st.success(f"Sentiment Analysis Results: {sentiment_scores}")
-                st.write(f"Positive: {sentiment_scores['pos']*100:.2f}%")
-                st.write(f"Negative: {sentiment_scores['neg']*100:.2f}%")
-                st.write(f"Neutral: {sentiment_scores['neu']*100:.2f}%")
+                st.write(f"Positive.😊: {sentiment_scores['pos']*100:.2f}%")
+                st.write(f"Negative:💀 {sentiment_scores['neg']*100:.2f}%")
+                st.write(f"Neutral:🤐 {sentiment_scores['neu']*100:.2f}%")
                 st.write(f"Overall Sentiment Score: {sentiment_scores['compound']:.2f}")
     else:
         st.warning("Please enter some text to analyze.")
