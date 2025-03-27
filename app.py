@@ -55,7 +55,7 @@ if st.button('Analyze'):
     if user_input:
         # Check if the input is nonsensical
         if is_nonsensical(user_input):
-            st.error("Invalid input. Please enter a valid text.")
+            st.error("Invalid input!!. Haha enter a valid text stupid.😉")
         else:
             # Detect language
             try:
