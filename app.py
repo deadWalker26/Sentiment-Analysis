@@ -13,6 +13,10 @@ grammar_tool = language_tool_python.LanguageToolPublicAPI('en-US')
 text = "This is a example of bad grammar."
 matches = grammar_tool.check(text)
 
+import requests
+response = requests.get("https://api.languagetool.org/v2/languages")
+print(response.status_code, response.text)
+
 for match in matches:
     print(match)
 
