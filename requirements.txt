@@ -13,6 +13,7 @@ GitPython==3.1.44
 huggingface-hub==0.29.2
 idna==3.10
 language-tool-python
+langdetect
 Jinja2==3.1.6
 jsonschema==4.23.0
 jsonschema-specifications==2024.10.1
