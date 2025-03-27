@@ -6,8 +6,16 @@ import re  # For regular expressions
 
 # Initialize VADER sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
-# Initialize LanguageTool for grammar checking
-grammar_tool = language_tool_python.LanguageTool('en-US')
+
+# Use LanguageTool API instead of the local Java server
+grammar_tool = language_tool_python.LanguageToolPublicAPI('en-US')
+
+text = "This is a example of bad grammar."
+matches = grammar_tool.check(text)
+
+for match in matches:
+    print(match)
+
 
 # Function to analyze sentiment using VADER
 def analyze_sentiment(text):
