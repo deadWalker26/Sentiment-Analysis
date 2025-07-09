@@ -11,10 +11,13 @@ DetectorFactory.seed = 0
 analyzer = SentimentIntensityAnalyzer()
 
 # Use LanguageTool API instead of the local Java server
-grammar_tool = language_tool_python.LanguageToolPublicAPI('en-US')
+grammar_tool = language_tool_python.LanguageTool('en-US')
 
-text = "This is a example of bad grammar."
-matches = grammar_tool.check(text)
+ text = 'A sentence with a error in the Hitchhiker’s Guide tot he Galaxy'
+ matches = tool.check(text)
+ len(matches)
+2
+tool.close() # Call `close()` to shut off the server when you're done.
 
 import requests
 response = requests.get("https://api.languagetool.org/v2/languages")
