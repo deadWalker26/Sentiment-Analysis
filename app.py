@@ -3,79 +3,102 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import language_tool_python
 from language_tool_python.utils import RateLimitError
 from langdetect import detect, DetectorFactory
+from textblob import TextBlob
 import re
 
 DetectorFactory.seed = 0
 
-# Initialize sentiment analyzer
-analyzer = SentimentIntensityAnalyzer()
+# Supported grammar check languages by LanguageTool (not exhaustive)
+SUPPORTED_LANGUAGES = {
+    'en': 'en-US',
+    'es': 'es',
+    'fr': 'fr',
+    'de': 'de',
+    'hi': 'hi',
+}
 
-# Try to initialize grammar tool
-try:
-    grammar_tool = language_tool_python.LanguageToolPublicAPI('en-US')
-except RateLimitError:
-    grammar_tool = None
-    st.warning("⚠️ Grammar check is temporarily unavailable due to API rate limits.")
+# Initialize VADER (only for English)
+vader = SentimentIntensityAnalyzer()
 
-# Function to analyze sentiment
-def analyze_sentiment(text):
-    if not text or not isinstance(text, str):
-        return None
-    return analyzer.polarity_scores(text)
-
-# Function to check grammar
-def check_grammar(text):
-    if grammar_tool is None:
-        return None  # grammar check disabled
+# Detect language code
+def detect_language(text):
     try:
-        return grammar_tool.check(text)
+        return detect(text)
+    except:
+        return 'en'
+
+# Create grammar tool based on language
+def get_grammar_tool(lang_code):
+    if lang_code not in SUPPORTED_LANGUAGES:
+        return None
+    try:
+        return language_tool_python.LanguageToolPublicAPI(SUPPORTED_LANGUAGES[lang_code])
     except RateLimitError:
-        st.warning("⚠️ You’ve hit the grammar check rate limit. Try again later.")
+        st.warning("⚠️ Rate limit hit for grammar check. Skipping...")
+        return None
+    except Exception as e:
+        st.error(f"Grammar tool error: {str(e)}")
         return None
 
-# Function to validate input
+# Grammar check
+def check_grammar(tool, text):
+    if not tool:
+        return []
+    try:
+        return tool.check(text)
+    except RateLimitError:
+        st.warning("Grammar rate limit reached.")
+        return []
+
+# Sentiment (English = VADER, else TextBlob)
+def analyze_sentiment(text, lang_code):
+    if lang_code == 'en':
+        return vader.polarity_scores(text)
+    else:
+        try:
+            blob = TextBlob(text)
+            return {"polarity": blob.sentiment.polarity}
+        except:
+            return {"polarity": 0}
+
+# Text validation
 def is_nonsensical(text):
     return len(text) < 5 or not re.search(r'[a-zA-Z]', text)
 
-# Streamlit UI
-st.title("🔍 Sentiment Analysis App")
-st.write("Enter some text to analyze sentiment and grammar 📃")
-
-user_input = st.text_area("Input Text", height=200)
+# UI
+st.title("🌍 Multilingual Sentiment & Grammar Analyzer")
+user_input = st.text_area("✍️ Enter your text (English, Spanish, French, Hinglish...)")
 
 if st.button("Analyze"):
     if user_input:
         if is_nonsensical(user_input):
-            st.error("Invalid input! Please enter meaningful text. 🤔")
+            st.error("Please enter meaningful text.")
         else:
-            # Detect language
-            try:
-                language = detect(user_input)
-                st.write(f"Detected Language: `{language}`")
-            except Exception:
-                st.error("Language detection failed.")
+            lang = detect_language(user_input)
+            st.write(f"🌐 Detected Language: `{lang}`")
 
-            # Check grammar
-            grammar_issues = check_grammar(user_input)
-            if grammar_issues:
-                if len(grammar_issues) > 0:
-                    st.warning("⚠️ Grammar issues found:")
-                    for issue in grammar_issues:
-                        st.write(f"- {issue.message} (Suggestion: {issue.replacements})")
-                else:
-                    st.success("✅ No grammar issues found.")
-            elif grammar_tool is None:
-                st.info("Grammar checking is disabled due to API rate limits.")
+            # Grammar checking
+            grammar_tool = get_grammar_tool(lang)
+            issues = check_grammar(grammar_tool, user_input)
+            if issues:
+                st.warning("✏️ Grammar Issues:")
+                for issue in issues:
+                    st.write(f"- {issue.message} (Suggestion: {issue.replacements})")
+            else:
+                st.success("✅ No grammar issues found.")
 
             # Sentiment
-            sentiment = analyze_sentiment(user_input)
-            if sentiment:
-                st.subheader("📊 Sentiment Results")
+            sentiment = analyze_sentiment(user_input, lang)
+            st.subheader("🧠 Sentiment Analysis")
+            if lang == 'en':
                 st.write(f"😊 Positive: {sentiment['pos']*100:.2f}%")
                 st.write(f"💀 Negative: {sentiment['neg']*100:.2f}%")
                 st.write(f"🤐 Neutral: {sentiment['neu']*100:.2f}%")
-                st.write(f"🧠 Compound Score: {sentiment['compound']:.2f}")
+                st.write(f"🧪 Compound: {sentiment['compound']:.2f}")
             else:
-                st.error("Sentiment analysis failed.")
+                score = sentiment['polarity']
+                label = "Positive" if score > 0 else "Negative" if score < 0 else "Neutral"
+                st.write(f"{label} ({score:.2f})")
     else:
-        st.warning("Please enter some text. 🙄")
+        st.warning("Input something to analyze. 🙄")
+
