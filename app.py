@@ -11,7 +11,7 @@ DetectorFactory.seed = 0
 analyzer = SentimentIntensityAnalyzer()
 
 # Use LanguageTool API instead of the local Java server
-grammar_tool = language_tool_python.LanguageTool('en-US')
+grammar_tool =  language_tool_python.LanguageToolPublicAPI('en-US')
 
 # Input text
 text = 'A sentence with a error in the Hitchhiker’s Guide tot he Galaxy'
