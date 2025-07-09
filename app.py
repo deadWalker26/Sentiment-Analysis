@@ -13,12 +13,21 @@ analyzer = SentimentIntensityAnalyzer()
 # Use LanguageTool API instead of the local Java server
 grammar_tool = language_tool_python.LanguageTool('en-US')
 
- text = 'A sentence with a error in the Hitchhiker’s Guide tot he Galaxy'
- matches = tool.check(text)
- len(matches)
-2
+# Input text
+text = 'A sentence with a error in the Hitchhiker’s Guide tot he Galaxy'
 
-tool.close() # Call `close()` to shut off the server when you're done.
+# Check for grammar mistakes
+matches = tool.check(text)
+
+# Print number of matches
+print("Grammar issues found:", len(matches))
+
+# Optionally show the mistakes
+for match in matches:
+    print(match)
+
+# Close the tool
+tool.close()
 
 import requests
 response = requests.get("https://api.languagetool.org/v2/languages")
