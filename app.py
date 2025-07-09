@@ -17,6 +17,7 @@ grammar_tool = language_tool_python.LanguageTool('en-US')
  matches = tool.check(text)
  len(matches)
 2
+
 tool.close() # Call `close()` to shut off the server when you're done.
 
 import requests
@@ -25,8 +26,12 @@ print(response.status_code, response.text)
 
 for match in matches:
     print(match)
-
-
+ 
+def main():
+    print("Sentiment Analysis App")
+    text = 'A sentence with a error in the Hitchhiker’s Guide tot he Galaxy'
+    print(text)
+ 
 # Function to analyze sentiment using VADER
 def analyze_sentiment(text):
     if not text or not isinstance(text, str):
