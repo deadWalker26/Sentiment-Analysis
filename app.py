@@ -17,7 +17,7 @@ grammar_tool =  language_tool_python.LanguageToolPublicAPI('en-US')
 text = 'A sentence with a error in the Hitchhiker’s Guide tot he Galaxy'
 
 # Check for grammar mistakes
-matches = tool.check(text)
+matches = grammer_tool.check(text)
 
 # Print number of matches
 print("Grammar issues found:", len(matches))
